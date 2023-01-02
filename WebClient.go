@@ -56,7 +56,7 @@ func ExecuteGet[T interface{}](urlToExecute string, params map[string]string, he
 	return &res, nil
 }
 
-func ExecutePost[T interface{}](urlToExecute string, body string, params map[string]string, headers map[string]string) (*T, error) {
+func ExecutePost[T interface{}](urlToExecute string, body any, params map[string]string, headers map[string]string) (*T, error) {
 	client := http.Client{}
 
 	request := http.Request{Method: http.MethodPost}
@@ -73,7 +73,14 @@ func ExecutePost[T interface{}](urlToExecute string, body string, params map[str
 
 	mapHeaders(headers, &request)
 
-	request.Body = io.NopCloser(strings.NewReader(body))
+	b, err := json.Marshal(body)
+
+	if err != nil {
+		log.Errorf("Failed to marshal body error: $1", err)
+		return nil, err
+	}
+
+	request.Body = io.NopCloser(strings.NewReader(string(b)))
 
 	response, err := client.Do(&request)
 
