@@ -1,4 +1,4 @@
-package web_utils
+package guu
 
 import (
 	"encoding/json"
