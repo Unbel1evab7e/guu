@@ -12,8 +12,6 @@ import (
 func ExecuteGet[T interface{}](urlToExecute string, params map[string]string, headers map[string]string) (*T, error) {
 	client := http.Client{}
 
-	request := http.Request{Method: http.MethodGet}
-
 	requestUrl, err := url.Parse(urlToExecute)
 
 	if err != nil {
@@ -22,11 +20,15 @@ func ExecuteGet[T interface{}](urlToExecute string, params map[string]string, he
 	}
 
 	mapQueryParams(params, requestUrl)
-	request.URL = requestUrl
+	request, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		log.Errorf("Failed to create request error: $1", err)
+		return nil, err
+	}
 
-	mapHeaders(headers, &request)
+	mapHeaders(headers, request)
 
-	response, err := client.Do(&request)
+	response, err := client.Do(request)
 
 	defer response.Body.Close()
 
@@ -35,9 +37,7 @@ func ExecuteGet[T interface{}](urlToExecute string, params map[string]string, he
 		return nil, err
 	}
 
-	var buf []byte
-
-	_, err = response.Body.Read(buf)
+	buf, err := io.ReadAll(response.Body)
 
 	if err != nil {
 		log.Errorf("Failed to read response error: $1", err)
@@ -59,8 +59,6 @@ func ExecuteGet[T interface{}](urlToExecute string, params map[string]string, he
 func ExecutePost[T interface{}](urlToExecute string, body any, params map[string]string, headers map[string]string) (*T, error) {
 	client := http.Client{}
 
-	request := http.Request{Method: http.MethodPost}
-
 	requestUrl, err := url.Parse(urlToExecute)
 
 	if err != nil {
@@ -69,9 +67,13 @@ func ExecutePost[T interface{}](urlToExecute string, body any, params map[string
 	}
 
 	mapQueryParams(params, requestUrl)
-	request.URL = requestUrl
+	request, err := http.NewRequest(http.MethodPost, requestUrl.String(), nil)
+	if err != nil {
+		log.Errorf("Failed to create request error: $1", err)
+		return nil, err
+	}
 
-	mapHeaders(headers, &request)
+	mapHeaders(headers, request)
 
 	b, err := json.Marshal(body)
 
@@ -82,7 +84,7 @@ func ExecutePost[T interface{}](urlToExecute string, body any, params map[string
 
 	request.Body = io.NopCloser(strings.NewReader(string(b)))
 
-	response, err := client.Do(&request)
+	response, err := client.Do(request)
 
 	defer response.Body.Close()
 
@@ -91,9 +93,7 @@ func ExecutePost[T interface{}](urlToExecute string, body any, params map[string
 		return nil, err
 	}
 
-	var buf []byte
-
-	_, err = response.Body.Read(buf)
+	buf, err := io.ReadAll(response.Body)
 
 	if err != nil {
 		log.Errorf("Failed to read response error: $1", err)
@@ -115,7 +115,7 @@ func ExecutePost[T interface{}](urlToExecute string, body any, params map[string
 func mapHeaders(headers map[string]string, request *http.Request) {
 	if headers != nil && len(headers) > 0 {
 		for k, v := range headers {
-			request.Header.Set(k, v)
+			request.Header.Add(k, v)
 		}
 	}
 }
