@@ -115,7 +115,7 @@ func ExecutePost[T interface{}](urlToExecute string, body any, params map[string
 func mapHeaders(headers map[string]string, request *http.Request) {
 	if headers != nil && len(headers) > 0 {
 		for k, v := range headers {
-			request.Header.Add(k, v)
+			request.Header.Set(k, v)
 		}
 	}
 }
@@ -123,7 +123,7 @@ func mapQueryParams(params map[string]string, startUrl *url.URL) {
 
 	if params != nil && len(params) > 0 {
 		for k, v := range params {
-			startUrl.Query().Add(k, v)
+			startUrl.Query().Set(k, v)
 		}
 	}
 }
