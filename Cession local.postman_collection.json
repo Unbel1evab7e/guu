@@ -1,0 +1,26 @@
+{
+	"info": {
+		"_postman_id": "34455404-b64a-4f87-b71a-435a0416e14a",
+		"name": "Cession local",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15922637"
+	},
+	"item": [
+		{
+			"name": "Main",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Fix",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
